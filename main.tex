@@ -1,0 +1,76 @@
+\documentclass{report}
+
+%%%%%%% PACKAGES %%%%%%%%
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2cm]{geometry}
+\usepackage{blindtext}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{notoccite} %citation number ordering
+\usepackage{lscape} %landscape table
+\usepackage{caption} %add a newline in the table caption
+\usepackage{ragged2e}   
+\usepackage[english]{babel}
+\usepackage{float}
+\usepackage{hyperref}
+
+\usepackage[
+backend=biber,  %references format (IEEE)
+style=ieee,
+sorting=none
+]{biblatex}
+\addbibresource{refs.bib} %rename this to your own bibliography
+\onehalfspace   % 1.5 line spacing
+
+\begin{document}
+\begin{titlepage}
+    \title{\textbf{Introduction to Machine Learning and Data Mining - Report 1} \\
+    \LARGE{Data:  Feature extraction, and visualization}}
+    
+    \author{Santiago Maldonado\\ Pawel Zielinski \\ Victor Hansen }
+    \date{October 2020}
+
+\end{titlepage}
+\maketitle
+
+\newpage
+\tableofcontents
+\listoffigures
+\listoftables
+
+\newpage
+\setcounter{page}{1}
+\pagenumbering{arabic} % Start roman numbering
+
+%%% CONTENT HERE %%%%
+\chapter{Description of the data}
+The selected data set contains information about the mollusk abalone. This animal is considered one of the most exquisite and demanded seafood. The breeding of the abalone has an economic and biologic interest due to the characteristics of the animal.\\
+In particular, the data set selected gathers physical information about thousands of specimens in order to determined the age of them. The age of a particular specimen of abalone is determined by cutting the shell thought the cone, staining it, and counting the number of rings through a microscope. This process is arduous and demanding, that is why it is of interest the possibility of determining the age due to the physical characteristics, process much easier than the one that has been exposed earlier.\\
+\\
+The data set was obtained from a \href{https://archive.ics.uci.edu/ml/datasets/Abalone}{web page} called "UCI Machine learning repository" in which it is outlined the source of the data, a non machine learning study from 1994: "The Population Biology of Abalone (Haliotis species) in Tasmania. I. Blacklip Abalone (H. rubra) from the North Coast and Islands of Bass Strait". The authors of the study were Warwick J Nash, Tracy L Sellers, Simon R Talbot, Andrew J Cawthorn and Wes B Ford. The research was carried in 5 different parts between the Tasmanian island and the southern Australian city, Melbourne, in order to establish, thank to different physical parameters, the age of the animals and its difference depending on the area they came from. \\
+\\
+The problem of interest is to determine the age of the abalones based on physical parameters. It is a classification problem, since a discrete response it is predicted. The attributes, or physical parameters, used to establish the age are sex, length, diameter, height, meat weight, gut weight, shell weight, whole weight and number of rings.   
+
+\chapter{Explanation of the attributes of the data}
+\chapter{Visualization(s) based on suitable visualization techniques including a principal component analysis (PCA).}
+\chapter{What we have learned about the data}
+\chapter{Problems}
+\chapter{Participation}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|l|l|}
+\hline
+\multicolumn{1}{|l|}{\textbf{Task}} & \multicolumn{1}{l|}{\textbf{Santiago Maldonado}} & \textbf{Pawel Zielinski} & \textbf{Victor Hansen} \\ \hline
+                                    &                                                  &                          &                        \\ \hline
+                                    &                                                  &                          &                        \\ \hline
+\end{tabular}
+\end{table}
+
+
+\end{document}
+
+\newpage
+\setstretch{1}  %reduce bibliography line spacing
+\printbibliography
+\end{document}
