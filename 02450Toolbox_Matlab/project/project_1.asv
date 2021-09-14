@@ -1,0 +1,17 @@
+%% Project assignment 1
+% The following code reads in the abalone dataset.
+cdir = fileparts(mfilename('fullpath'));
+file_path = fullfile(cdir,'../project/Data_abalone.csv');
+abalone_table = readtable(file_path);
+X = table2array(abalone_table(:, 2:8));
+Data = fileread(FileName);
+Data = strrep(Data, ',', '.');
+FID = fopen(NewFileName, 'w');
+fwrite(FID, Data, 'char');
+fclose(FID);
+
+M = cell2mat(X);
+
+% Mean values for attributes
+% What to do with the nominal?
+mean(X(1:end,2))
