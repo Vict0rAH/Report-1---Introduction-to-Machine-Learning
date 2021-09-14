@@ -15,3 +15,5 @@ X = table2array(abalone_table(:, 2:8));
 % Mean values for attributes
 % What to do with the nominal?
 mean(X(1:end,2))
+
+%Sample text
