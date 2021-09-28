@@ -260,3 +260,4 @@ hold off
 %% 
 % What to do with the nominal?
 mode(categorical(table2cell(abalone_table(:,1))))
+[GC,GR]=groupcounts(categorical(table2cell(abalone_table(:,1))))
