@@ -262,3 +262,45 @@ hold off
 % What to do with the nominal?
 mode(categorical(table2cell(abalone_table(:,1))))
 [GC,GR]=groupcounts(categorical(table2cell(abalone_table(:,1))))
+
+%%
+%PCA section
+
+% X=X(1:20:4177,:); %divide dataset
+X = rmoutliers(X); %remove outliers
+
+X=X';
+mean_rows=mean(X,2); % mean value for every attribute
+number_samples=length(X); % number of samples in our dataset
+mean_matrix=mean_rows*ones(1,number_samples); % expanding mean values into matrix for later substarction
+B=X-mean_matrix;  % new B matrix (X-mean)
+
+std_deviation=[0.12 0.099 0.042 4.95 0.9 0.11 0.14];
+std_dev=std_deviation';
+B=B';  % transposed matrix (because of youtube example)
+Bn=B;
+% for i=1:7
+%     Bn(:,i)=B(:,i).*(1/std_dev(i)); % dividing by standard deviation (to normalize)
+% end
+
+[U,S,V] = svd(Bn/sqrt(number_samples),'econ');  % Find principal components (SVD) normalized by number of samples
+%max value of rings(age) is 29
+figure(1)
+for i=1:number_samples  % ploting first three Principal Components of dataset
+    %tried to plot it in sense of different age slots.
+    %plotting 1/30 od samples not to let it look to messy
+    x=V(:,1)'*Bn(i,:)';
+    y=V(:,2)'*Bn(i,:)';
+    z=V(:,3)'*Bn(i,:)';
+    if(rings(i)<6)
+        plot3(x,y,z,'ro','LineWidth',1.5)
+    elseif (rings(i)>=6 && rings(i)<10)
+        plot3(x,y,z,'bo','LineWidth',1.5)
+    elseif (rings(i)>=10 && rings(i)<14)
+        plot3(x,y,z,'kx','LineWidth',1.5)
+    else
+        plot3(x,y,z,'gx','LineWidth',1.5)
+    end
+    hold on
+end
+hold off
