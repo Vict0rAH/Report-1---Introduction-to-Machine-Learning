@@ -20,7 +20,7 @@ abalone_table = readtable(file_path);
 % Extract attribute names from the first column
 attributeNames = RAW(1,1:end);
 % Extract unique class names from the first row
-classLabels = RAW(2:30:end,1);
+classLabels = RAW(2:end,1);
 classNames = unique(classLabels);
 % Extract class labels that match the class names
 [y_,y] = ismember(classLabels, classNames); y = y-1;
@@ -240,7 +240,7 @@ title('Abalone data');
 
 sex = table2array(abalone_table(:, 1));
 figure(13)
-for i=1:length(X(:,1))
+for i=1:4177
    if(strcmp(sex{i, 1}, 'M'))
        plot(X(i, 1), X(i,4), 'o', 'MarkerEdgeColor', 'b', 'MarkerFaceColor', 'b')
        hold on
