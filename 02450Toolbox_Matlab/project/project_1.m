@@ -25,7 +25,7 @@ classNames = unique(classLabels);
 % Extract class labels that match the class names
 [y_,y] = ismember(classLabels, classNames); y = y-1;
 
-%% Summary statistics for numerical attributes
+%% SUMMARY STATISTICS FOR NUMERICAL ATTRIBUTES
 Sr = {'Length','Diameter','Height','Whole weight','Shucked weight','Viscera weight','Shell weight','Rings'};
 sexNames = {'Male', 'Female', 'Infant'};
 % summary stadistics
@@ -51,7 +51,65 @@ end
 % Create a table with the stadistics summary
 Stats = table(m', q, v', s', r', 'VariableNames', stats_names, 'RowNames', Sr');
 
-% study the covariance and correlation between atributes
+%% DEVIATION OF THE ATTRIBUTES
+figure(1)
+mfig('Abalone: Attribute standard deviations'); clf; hold all; 
+bar(1:size(Stats), s);
+xticks(1:size(Stats))
+xticklabels({'Length', 'Diameter', 'Height', 'Whole Weight', 'Shucked Weight', 'Viscera Weight', 'Shell Weight', 'Rings'});
+ylabel('Standard deviation')
+xlabel('Attributes')
+title('Abalone: attribute standard deviations')
+
+%% BOXPLOTS
+% boxplots of the dimensions and different weights
+figure(3)
+boxplot(X(1:end,1:3),{'Length','Diameter','Height'})
+xlabel('Attribute')
+ylabel('Size (mm)')
+title('Box plots of shize attributes')
+figure(4)
+boxplot(X(1:end,4:7),{'Whole weight','Shucked weight','Viscera weight','Shell weight'})
+xlabel('Attribute')
+ylabel('Weight (g)')
+title('Box plots of weight attributes')
+
+%% REMOVING THE OUTLIERS
+
+X = rmoutliers(X);
+
+%% NORMAL DISTRIBUTION ANALYSIS 
+
+% Calculate the statistics without outliers
+
+for i = 1:8
+    m(1, i) = mean(X(1:end,i));
+    q(i, :) = quantile(X(1:end,i),[0 0.25 0.5 0.75 1]);
+    v(1, i) = var(X(1:end,i));
+    s(1, i) = std(X(1:end,i));
+    r(1, i) = range(X(1:end, i));
+end
+Samples = 113;
+% Number of beans
+NBins = 20;
+
+% Plot a histogram
+for i=1:8
+    figure(5)
+    subplot(2, 4, i)
+    H(i) = histogram(X(:, i));
+    hold on
+    [n, BinEdges] = histcounts(X(:, i));
+    x = linspace(min(X(:, i)), max(X(:, i)), 1000);
+    plot(x, normpdf(x, m(i), s(i)), 'r', 'LineWidth', 5);
+    xlabel(Sr(i));
+    title(Sr(i))
+    xlim([min(x), max(x)]);
+    hold off
+end
+
+%% STUDY THE COVARIANCE AND THE CORRELATION 
+
 cov_matrix = cell(8, 8);
 correlation = zeros(8, 8);
 for i = 1:8
@@ -63,17 +121,6 @@ for i = 1:8
         correlation(i, j) = corr(X(1:end, i), X(1:end, j));
     end
 end
-
-%% Deviation of the attributes
-figure(1)
-mfig('Abalone: Attribute standard deviations'); clf; hold all; 
-bar(1:size(Stats), s);
-xticks(1:size(Stats))
-xticklabels({'Length', 'Diameter', 'Height', 'Whole Weight', 'Shucked Weight', 'Viscera Weight', 'Shell Weight', 'Rings'});
-ylabel('Standard deviation')
-xlabel('Attributes')
-title('Abalone: attribute standard deviations')
-
 %% Visualization
 
 % Subtract the mean from the data
@@ -102,18 +149,6 @@ xlabel('Principal component');
 ylabel('Variance explained value');
 title('Variance explained by principal components');
 hold off
-
-% boxplots of the dimensions and different weights
-figure(3)
-boxplot(X(1:end,1:3),{'Length','Diameter','Height'})
-xlabel('Attribute')
-ylabel('Size (mm)')
-title('Box plots of shize attributes')
-figure(4)
-boxplot(X(1:end,4:7),{'Whole weight','Shucked weight','Viscera weight','Shell weight'})
-xlabel('Attribute')
-ylabel('Weight (g)')
-title('Box plots of weight attributes')
 
 %% Investigate how standardization affects PCA
 % Subtract the mean from the data
@@ -205,13 +240,6 @@ for k = 0:1
 end
 
 %%
-% Histogram plots
-for i=1:8
-   figure(i+4)
-   H(i) = histogram(X(:, i));
-   xlabel(Sr(i));
-   title(['Histogram of the attribute ' Sr(i)])
-end
 
 % Plots distinguising the sex (M) or (F) or (I)
 % Data attributes to be plotted

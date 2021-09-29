@@ -20,12 +20,12 @@ abalone_table = readtable(file_path);
 % Extract attribute names from the first column
 attributeNames = RAW(1,1:end);
 % Extract unique class names from the first row
-classLabels = RAW(2:end,1);
+classLabels = RAW(2:30:end,1);
 classNames = unique(classLabels);
 % Extract class labels that match the class names
 [y_,y] = ismember(classLabels, classNames); y = y-1;
 
-%% Summary statistics for numerical attributes
+%% SUMMARY STATISTICS FOR NUMERICAL ATTRIBUTES
 Sr = {'Length','Diameter','Height','Whole weight','Shucked weight','Viscera weight','Shell weight','Rings'};
 sexNames = {'Male', 'Female', 'Infant'};
 % summary stadistics
@@ -64,7 +64,7 @@ for i = 1:8
     end
 end
 
-%% Deviation of the attributes
+%% DEVIATION OF THE ATTRIBUTES
 figure(1)
 mfig('Abalone: Attribute standard deviations'); clf; hold all; 
 bar(1:size(Stats), s);
@@ -73,6 +73,58 @@ xticklabels({'Length', 'Diameter', 'Height', 'Whole Weight', 'Shucked Weight', '
 ylabel('Standard deviation')
 xlabel('Attributes')
 title('Abalone: attribute standard deviations')
+
+%% BOXPLOTS
+% boxplots of the dimensions and different weights
+figure(3)
+boxplot(X(1:end,1:3),{'Length','Diameter','Height'})
+xlabel('Attribute')
+ylabel('Size (mm)')
+title('Box plots of shize attributes')
+figure(4)
+boxplot(X(1:end,4:7),{'Whole weight','Shucked weight','Viscera weight','Shell weight'})
+xlabel('Attribute')
+ylabel('Weight (g)')
+title('Box plots of weight attributes')
+
+%% REMOVING THE OUTLIERS
+
+X = rmoutliers(X);
+
+%% NORMAL DISTRIBUTION ANALYSIS 
+
+% Calculate the statistics without outliers
+
+for i = 1:8
+    m(1, i) = mean(X(1:end,i));
+    q(i, :) = quantile(X(1:end,i),[0 0.25 0.5 0.75 1]);
+    v(1, i) = var(X(1:end,i));
+    s(1, i) = std(X(1:end,i));
+    r(1, i) = range(X(1:end, i));
+end
+
+% Number of bins in histogram
+NBins = 50;
+
+% Generate samples from the Normal distribution
+X = normrnd(mu, s, N, 1);
+
+% Plot a histogram
+mfig('Normal distribution'); clf; hold all;
+[n, x] = hist(X, NBins);
+bar(x, n/N./gradient(x));
+x = linspace(min(x), max(x), 1000);
+plot(x, normpdf(x, mu, s), 'r', 'LineWidth', 5);
+xlim([min(x), max(x)]);
+
+% Histogram plots
+Nbins = 20;
+for i=1:8
+   figure(i+4)
+   H(i) = histogram(X(:, i), Nbins);
+   xlabel(Sr(i));
+   title(['Histogram of the attribute ' Sr(i)])
+end
 
 %% Visualization
 
@@ -102,18 +154,6 @@ xlabel('Principal component');
 ylabel('Variance explained value');
 title('Variance explained by principal components');
 hold off
-
-% boxplots of the dimensions and different weights
-figure(3)
-boxplot(X(1:end,1:3),{'Length','Diameter','Height'})
-xlabel('Attribute')
-ylabel('Size (mm)')
-title('Box plots of shize attributes')
-figure(4)
-boxplot(X(1:end,4:7),{'Whole weight','Shucked weight','Viscera weight','Shell weight'})
-xlabel('Attribute')
-ylabel('Weight (g)')
-title('Box plots of weight attributes')
 
 %% Investigate how standardization affects PCA
 % Subtract the mean from the data
@@ -205,13 +245,6 @@ for k = 0:1
 end
 
 %%
-% Histogram plots
-for i=1:8
-   figure(i+4)
-   H(i) = histogram(X(:, i));
-   xlabel(Sr(i));
-   title(['Histogram of the attribute ' Sr(i)])
-end
 
 % Plots distinguising the sex (M) or (F) or (I)
 % Data attributes to be plotted
@@ -240,7 +273,7 @@ title('Abalone data');
 
 sex = table2array(abalone_table(:, 1));
 figure(13)
-for i=1:4177
+for i=1:length(X(:,1))
    if(strcmp(sex{i, 1}, 'M'))
        plot(X(i, 1), X(i,4), 'o', 'MarkerEdgeColor', 'b', 'MarkerFaceColor', 'b')
        hold on
@@ -262,3 +295,45 @@ hold off
 % What to do with the nominal?
 mode(categorical(table2cell(abalone_table(:,1))))
 [GC,GR]=groupcounts(categorical(table2cell(abalone_table(:,1))))
+
+%%
+%PCA section
+
+% X=X(1:20:4177,:); %divide dataset
+X = rmoutliers(X); %remove outliers
+
+X=X';
+mean_rows=mean(X,2); % mean value for every attribute
+number_samples=length(X); % number of samples in our dataset
+mean_matrix=mean_rows*ones(1,number_samples); % expanding mean values into matrix for later substarction
+B=X-mean_matrix;  % new B matrix (X-mean)
+
+std_deviation=[0.12 0.099 0.042 4.95 0.9 0.11 0.14];
+std_dev=std_deviation';
+B=B';  % transposed matrix (because of youtube example)
+Bn=B;
+% for i=1:7
+%     Bn(:,i)=B(:,i).*(1/std_dev(i)); % dividing by standard deviation (to normalize)
+% end
+
+[U,S,V] = svd(Bn/sqrt(number_samples),'econ');  % Find principal components (SVD) normalized by number of samples
+%max value of rings(age) is 29
+figure(1)
+for i=1:number_samples  % ploting first three Principal Components of dataset
+    %tried to plot it in sense of different age slots.
+    %plotting 1/30 od samples not to let it look to messy
+    x=V(:,1)'*Bn(i,:)';
+    y=V(:,2)'*Bn(i,:)';
+    z=V(:,3)'*Bn(i,:)';
+    if(rings(i)<6)
+        plot3(x,y,z,'ro','LineWidth',1.5)
+    elseif (rings(i)>=6 && rings(i)<10)
+        plot3(x,y,z,'bo','LineWidth',1.5)
+    elseif (rings(i)>=10 && rings(i)<14)
+        plot3(x,y,z,'kx','LineWidth',1.5)
+    else
+        plot3(x,y,z,'gx','LineWidth',1.5)
+    end
+    hold on
+end
+hold off
