@@ -293,23 +293,26 @@ mode(categorical(table2cell(abalone_table(:,1))))
 
 %%
 %PCA section
-
 % X=X(1:20:4177,:); %divide dataset
-X = rmoutliers(X); %remove outliers
+%  X = rmoutliers(X); %remove outliers
+rings=X(1:end,8);
+X1=X';
 
-X=X';
-mean_rows=mean(X,2); % mean value for every attribute
-number_samples=length(X); % number of samples in our dataset
+mean_rows=mean(X1,2); % mean value for every attribute
+number_samples=length(X1); % number of samples in our dataset
 mean_matrix=mean_rows*ones(1,number_samples); % expanding mean values into matrix for later substarction
-B=X-mean_matrix;  % new B matrix (X-mean)
-
-std_deviation=[0.12 0.099 0.042 4.95 0.9 0.11 0.14];
-std_dev=std_deviation';
+B=X1-mean_matrix;  % new B matrix (X-mean)
+% std_deviation=[0.12 0.099 0.042 4.95 0.9 0.11 0.14];
+% std_dev=std_deviation';
 B=B';  % transposed matrix (because of youtube example)
 Bn=B;
-% for i=1:7
-%     Bn(:,i)=B(:,i).*(1/std_dev(i)); % dividing by standard deviation (to normalize)
-% end
+
+for i = 1:8
+    s(1, i) = std(X(1:end,i));
+end
+for i=1:7
+    Bn(:,i)=B(:,i).*(1/s(1,i)); % dividing by standard deviation (to normalize)
+end
 
 [U,S,V] = svd(Bn/sqrt(number_samples),'econ');  % Find principal components (SVD) normalized by number of samples
 %max value of rings(age) is 29
@@ -317,9 +320,9 @@ figure(1)
 for i=1:number_samples  % ploting first three Principal Components of dataset
     %tried to plot it in sense of different age slots.
     %plotting 1/30 od samples not to let it look to messy
-    x=V(:,1)'*Bn(i,:)';
-    y=V(:,2)'*Bn(i,:)';
-    z=V(:,3)'*Bn(i,:)';
+    x=V(:,1)'*X(i,:)';
+    y=V(:,2)'*X(i,:)';
+    z=V(:,3)'*X(i,:)';
     if(rings(i)<6)
         plot3(x,y,z,'ro','LineWidth',1.5)
     elseif (rings(i)>=6 && rings(i)<10)
@@ -331,4 +334,65 @@ for i=1:number_samples  % ploting first three Principal Components of dataset
     end
     hold on
 end
+grid minor
+set(findall(gca,'-property','FontSize'),'FontSize',20);
+xlabel('First principal component');
+ylabel('Second principal component');
+zlabel('Third principal component');
+% legend({'Age < 6','6 < Age < 10','10 < Age < 14','Age > 14'}, ...
+%         'Location','best');
+title('PCA visualization of first three components');
 hold off
+
+
+figure(2)
+for i=1:number_samples  % ploting first three Principal Components of dataset
+    %tried to plot it in sense of different age slots.
+    %plotting 1/30 od samples not to let it look to messy
+    x1=V(:,1)'*X(i,:)';
+    y1=V(:,2)'*X(i,:)';
+%     z=V(:,3)'*X(i,:)';
+    if(rings(i)<6)
+        plot(x1,y1,'ro','LineWidth',1.5)
+    elseif (rings(i)>=6 && rings(i)<10)
+        plot(x1,y1,'bo','LineWidth',1.5)
+    elseif (rings(i)>=10 && rings(i)<14)
+        plot(x1,y1,'kx','LineWidth',1.5)
+    else
+        plot(x1,y1,'gx','LineWidth',1.5)
+    end
+    hold on
+end
+grid minor
+set(findall(gca,'-property','FontSize'),'FontSize',20);
+xlabel('First principal component');
+ylabel('Second principal component');
+% legend
+%({'Age < 6','6 < Age < 10','10 < Age < 14','Age > 14'}, ...
+       % 'Location','best');
+% zlabel('Third principal component');
+title('PCA visualization of first two components');
+hold off
+
+
+% Compute variance explained
+rho = diag(S).^2./sum(diag(S).^2);
+threshold = 0.90;
+
+% Plot variance explained
+figure(3)
+clf;
+hold on
+plot(rho, 'x-','LineWidth',1.5);
+plot(cumsum(rho), 'o-','LineWidth',1.5);
+plot([0,length(rho)], [threshold, threshold], 'k--','LineWidth',1.5);
+legend({'Individual','Cumulative','Threshold'}, ...
+        'Location','best');
+set(findall(gca,'-property','FontSize'),'FontSize',20);
+ylim([0, 1]);
+xlim([1, length(rho)]);
+grid minor
+xlabel('Principal component');
+ylabel('Variance explained value');
+title('Variance explained by principal components');
+
