@@ -310,7 +310,7 @@ Bn=B;
 for i = 1:8
     s(1, i) = std(X(1:end,i));
 end
-for i=1:7
+for i=1:8
     Bn(:,i)=B(:,i).*(1/s(1,i)); % dividing by standard deviation (to normalize)
 end
 
@@ -320,9 +320,9 @@ figure(1)
 for i=1:number_samples  % ploting first three Principal Components of dataset
     %tried to plot it in sense of different age slots.
     %plotting 1/30 od samples not to let it look to messy
-    x=V(:,1)'*X(i,:)';
-    y=V(:,2)'*X(i,:)';
-    z=V(:,3)'*X(i,:)';
+    x=V(:,1)'*Bn(i,:)';
+    y=V(:,2)'*Bn(i,:)';
+    z=V(:,3)'*Bn(i,:)';
     if(rings(i)<6)
         plot3(x,y,z,'ro','LineWidth',1.5)
     elseif (rings(i)>=6 && rings(i)<10)
@@ -349,8 +349,8 @@ figure(2)
 for i=1:number_samples  % ploting first three Principal Components of dataset
     %tried to plot it in sense of different age slots.
     %plotting 1/30 od samples not to let it look to messy
-    x1=V(:,1)'*X(i,:)';
-    y1=V(:,2)'*X(i,:)';
+    x1=V(:,1)'*Bn(i,:)';
+    y1=V(:,2)'*Bn(i,:)';
 %     z=V(:,3)'*X(i,:)';
     if(rings(i)<6)
         plot(x1,y1,'ro','LineWidth',1.5)
@@ -363,6 +363,12 @@ for i=1:number_samples  % ploting first three Principal Components of dataset
     end
     hold on
 end
+
+% mean_rows1=mean(Bn',2); % mean value for ploting vectors
+mean_rows1=mean_rows;%oversinging the mean value for vectors
+
+plot([mean_rows1(1) mean_rows1(1)+U(1,1)*S(1,1)],[mean_rows1(2) mean_rows1(2)+U(2,1)*S(1,1)],'c-','LineWidth',2.5);
+plot([mean_rows1(1) mean_rows1(1)+U(1,2)*S(2,2)],[mean_rows1(2) mean_rows1(2)+U(2,2)*S(2,2)],'c-','LineWidth',2.5);
 grid minor
 set(findall(gca,'-property','FontSize'),'FontSize',20);
 xlabel('First principal component');
