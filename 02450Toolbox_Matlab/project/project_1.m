@@ -171,8 +171,12 @@ xlim([1, length(rho2)]);
 grid minor
 xlabel('Principal component');
 ylabel('Variance explained value');
-title('Variance explained by principal components');
+title('Variance explained by principal components, standardized data');
 hold off
+
+saveas(gcf,'variance_explained','png')
+% if you are unsure where your picture will end
+system('pwd')
 
 % Store the two in a cell, so we can just loop over them:
 Ys = {Y1, Y2};
