@@ -121,35 +121,6 @@ for i = 1:8
         correlation(i, j) = corr(X(1:end, i), X(1:end, j));
     end
 end
-%% Visualization
-
-% Subtract the mean from the data
-Y = bsxfun(@minus, X, mean(X));
-
-% Obtain the PCA solution by calculate the SVD of Y
-[U, S, V] = svd(Y);
-
-% Compute variance explained
-rho = diag(S).^2./sum(diag(S).^2);
-threshold = 0.95;
-
-% Plot variance explained
-figure(2)
-mfig('Abalone: Var. explained'); clf;
-hold on
-plot(rho, 'x-');
-plot(cumsum(rho), 'o-');
-plot([0,length(rho)], [threshold, threshold], 'k--');
-legend({'Individual','Cumulative','Threshold'}, ...
-        'Location','best');
-ylim([0, 1]);
-xlim([1, length(rho)]);
-grid minor
-xlabel('Principal component');
-ylabel('Variance explained value');
-title('Variance explained by principal components');
-hold off
-
 %% Investigate how standardization affects PCA
 % Subtract the mean from the data
 Y1 = bsxfun(@minus, X, mean(X));
@@ -161,6 +132,47 @@ Y2 = bsxfun(@times, Y2, 1./std(X));
 % The formula in the exercise description corresponds to:
 %Y2 = (X - ones(size(X,1),1)*mean(X) ) * diag(1./std(X))
 % But using bsxfun is a bit cleaner and works better for large X.
+
+% The variance explained is now calculated once more for the standardized
+% data
+[U1, S1, V1] = svd(Y1);
+[U2, S2, V2] = svd(Y2);
+
+% Compute variance explained
+rho1 = diag(S1).^2./sum(diag(S1).^2);
+rho2 = diag(S2).^2./sum(diag(S2).^2);
+threshold = 0.95;
+
+% Plot variance explained
+mfig('Abalone: Var. explained, standardized'); clf;
+subplot(2,1,1)
+hold on
+plot(rho1, 'x-');
+plot(cumsum(rho1), 'o-');
+plot([0,length(rho1)], [threshold, threshold], 'k--');
+legend({'Individual','Cumulative','Threshold'}, ...
+        'Location','best');
+ylim([0, 1]);
+xlim([1, length(rho1)]);
+grid minor
+xlabel('Principal component');
+ylabel('Variance explained value');
+title('Variance explained by principal components');
+hold off
+subplot(2,1,2)
+hold on
+plot(rho2, 'x-');
+plot(cumsum(rho2), 'o-');
+plot([0,length(rho2)], [threshold, threshold], 'k--');
+legend({'Individual','Cumulative','Threshold'}, ...
+        'Location','best');
+ylim([0, 1]);
+xlim([1, length(rho2)]);
+grid minor
+xlabel('Principal component');
+ylabel('Variance explained value');
+title('Variance explained by principal components');
+hold off
 
 % Store the two in a cell, so we can just loop over them:
 Ys = {Y1, Y2};
